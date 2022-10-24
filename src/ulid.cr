@@ -15,16 +15,16 @@ module ULID
   # ULID.generate
   # # => "01B3EAF48P97R8MP9WS6MHDTZ3"
   # ```
-  def generate(seed_time : Time = Time.now) : String
+  def generate(seed_time : Time = Time.utc) : String
     encode_time(seed_time, TIME_LEN) + encode_random(RANDOM_LEN)
   end
 
   private def encode_time(now : Time, len : Int32) : String
-    ms = now.epoch_ms
+    ms = now.to_unix_ms
 
     String.build do |io|
       len.times do |i|
-        mod = ms % ENCODING_LEN
+        mod = (ms % ENCODING_LEN).to_i32
         io << ENCODING[mod]
         ms = (ms - mod) / ENCODING_LEN
       end
